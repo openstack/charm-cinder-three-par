@@ -1,0 +1,33 @@
+options:
+  san-ip:
+    type: string
+    description: 'The hostname (or IP address) for the Three Par Cluster API endpoint.'
+    default:
+  san-login:
+    type: string
+    description: 'Cluster account used by Cinder service.'
+    default:
+  san-password:
+    type: string
+    description: 'Password for Cluster Admin account (san-password)'
+    default:
+  hp3par-username:
+    type: string
+    description: ''
+    default:
+  hp3par-password:
+    type: string
+    description: ''
+    default:
+  hp3par-api-url:
+    type: string
+    description: ''
+    default:
+  hp3par-cpg:
+    type: string
+    description: ''
+    default:
+  volume-backend-name:
+    type: string
+    description: ''
+    default:
