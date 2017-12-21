@@ -8,7 +8,7 @@ assert three_par
 charm.use_defaults('charm.installed')
 
 
-@reactive.when_any('storage-backend.connected', 'storage-backend.changed')
+@reactive.when_any('storage-backend.joined', 'storage-backend.changed')
 @reactive.when_not('storage-backend.available')
 def storage_backend():
     with charm.provide_charm_instance() as charm_class:
