@@ -1,33 +1,33 @@
 options:
   san-ip:
     type: string
-    description: 'The hostname (or IP address) for the Three Par Cluster API endpoint.'
+    description: IP address of SAN controller for SSH access to the array
     default:
   san-login:
     type: string
-    description: 'Cluster account used by Cinder service.'
+    description: Username for SAN controller for SSH access to the array
     default:
   san-password:
     type: string
-    description: 'Password for Cluster Admin account (san-password)'
+    description: Password for SAN controller for SSH access to the array
     default:
   hp3par-username:
     type: string
-    description: ''
+    description: 3PAR username with the 'edit' role
     default:
   hp3par-password:
     type: string
-    description: ''
+    description: 3PAR password for the user specified in hpe3par_username
     default:
   hp3par-api-url:
     type: string
-    description: ''
+    description: '3PAR WS API Server URL'
     default:
   hp3par-cpg:
     type: string
-    description: ''
+    description: 3PAR CPG to use for volume creation
     default:
   volume-backend-name:
     type: string
-    description: ''
+    description: Name to present to cinder, leave blank to use charm (or alias) name
     default:

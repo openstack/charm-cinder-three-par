@@ -1,5 +1,5 @@
 includes: ['layer:openstack']
 options:
   basic:
-    use_venv: true
+    use_venv: false
     include_system_packages: true

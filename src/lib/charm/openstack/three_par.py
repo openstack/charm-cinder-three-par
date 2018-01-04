@@ -8,7 +8,7 @@ from charmhelpers.core.hookenv import (
     status_set,
     service_name
 )
-
+from charmhelpers.contrib.python.packages import pip_install
 from charmhelpers.contrib.openstack.context import OSContextGenerator
 import charmhelpers.contrib.openstack.utils as ch_utils
 from charms_openstack.charm import OpenStackCharm
@@ -19,6 +19,10 @@ class ThreeParCharm(OpenStackCharm):
     name = 'three-par'
     packages = ['']
     release = 'ocata'
+
+    def install(self):
+        pip_install('python-3parclient>=4.0,<5.0')
+        status_set('waiting', 'Charm installed, waiting on Cinder relation')
 
     def set_relation_data(self):
         rel_id = relation_ids('storage-backend')
@@ -43,14 +47,18 @@ class ThreeParSubordinateContext(OSContextGenerator):
         log('Generating cinder.conf stanza')
         ctxt = []
         charm_config = config()
+        # Grab the service name in case the user wants the default backend name
         service = charm_config['volume-backend-name'] or service_name()
         for key in charm_config.keys():
             if key is 'volume-backend-name':
-                ctxt.append(('volume_backend_name', service_name()))
-            ctxt.append((key.replace('-', '_'), charm_config[key]))
+                ctxt.append((key, service))
+            elif key in ['verbose', 'debug']:
+                continue
+            else:
+                ctxt.append((key.replace('-', '_'), charm_config[key]))
         ctxt.append((
             'volume_driver',
-            'cinder.volume.drivers.san.hp.hp_3par_fc.HP3PARFCDriver'))
+            'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver'))
         for rid in relation_ids(self.interfaces[0]):
             log('Setting relation data for {}'.format(rid))
             self.related = True
