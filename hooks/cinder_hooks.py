@@ -22,6 +22,7 @@ hooks = Hooks()
 @hooks.hook('install')
 def install():
     pip_execute('install python-3parclient')
+    pip_execute('uninstall certifi urllib3 requests')
 
 
 @hooks.hook('config-changed',
