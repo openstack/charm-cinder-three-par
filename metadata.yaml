@@ -1,0 +1,21 @@
+"name": "cinder-three-par"
+"summary": "Configure OpenStack Cinder to use 3Par storage."
+"maintainer": "Michael Skalka <michael.skalka@canonical.com>"
+"description": |
+  This charm will add a 'three-par' section to the cinder.conf
+  file and place the approriate configuration information in that
+  section and enable it.
+"tags":
+- "openstack"
+- "storage"
+"series":
+- "xenial"
+"requires":
+  "juju-info":
+    "interface": "juju-info"
+    "scope": "container"
+"provides":
+  "storage-backend":
+    "interface": "cinder-backend"
+    "scope": "container"
+"subordinate": !!bool "true"

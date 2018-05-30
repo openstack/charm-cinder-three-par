@@ -1,0 +1,9 @@
+"options":
+  "cinder-three-par": {}
+  "basic":
+    "use_venv": !!bool "true"
+    "packages": []
+    "include_system_packages": !!bool "true"
+"includes":
+- "layer:basic"
+"is": "cinder-three-par"
