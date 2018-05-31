@@ -3,7 +3,7 @@
 import sys
 import json
 
-from charmhelpers.contrib.python import pip_execute
+from pip import main as pip_execute
 
 from charmhelpers.core.hookenv import (
     Hooks,
@@ -12,6 +12,7 @@ from charmhelpers.core.hookenv import (
     service_name,
     relation_set,
     relation_ids,
+    status_set,
     log
 )
 
@@ -19,10 +20,12 @@ from cinder_contexts import ThreeParSubordinateContext
 
 hooks = Hooks()
 
+
 @hooks.hook('install')
 def install():
-    pip_execute('install python-3parclient')
-    pip_execute('uninstall certifi urllib3 requests')
+    pip_execute(['install', 'python-3parclient'])
+    pip_execute(['uninstall', 'certifi', 'urllib3', 'requests'])
+    status_set('active', 'Unit is ready')
 
 
 @hooks.hook('config-changed',
