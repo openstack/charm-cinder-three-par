@@ -12,6 +12,7 @@ from charmhelpers.core.hookenv import (
     service_name,
     relation_set,
     relation_ids,
+    status_set,
     log
 )
 
@@ -24,6 +25,7 @@ hooks = Hooks()
 def install():
     pip_execute(['install', 'python-3parclient'])
     pip_execute(['uninstall', 'certifi', 'urllib3', 'requests'])
+    status_set('active', 'Unit is ready')
 
 
 @hooks.hook('config-changed',
