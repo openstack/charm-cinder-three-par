@@ -8,6 +8,7 @@ import logging
 from ops.charm import CharmBase
 from ops.main import main
 from ops.framework import StoredState
+from ops.model import MaintenanceStatus, ActiveStatus
 
 from charmhelpers.fetch.ubuntu import apt_install, apt_purge
 
@@ -33,7 +34,6 @@ def CinderThreeParContext(charm_config, service):
             }
         }
     }
-
 
 
 class CharmCinderThreeParCharm(CharmBase):
@@ -63,30 +63,39 @@ class CharmCinderThreeParCharm(CharmBase):
         return self.framework.model.get_relation(rel_name).units
 
     def _on_install(self, _):
-        self.unit.status = ops.model.MaintenanceStatus(
+        self.unit.status = MaintenanceStatus(
             "Installing packages")
         apt_install(['python3-3parclient'])
         try:
-            apt_purge(['python3-certifi', 'python3-urllib3', 'python3-requests'])
+            apt_purge(['python3-certifi',
+                       'python3-urllib3',
+                       'python3-requests'])
         except Exception as e:
-            logger.debug("Tried removing packages on install and failed with {}, ignoring".format(str(e)))
-        self.unit.status = ops.model.ActiveStatus("Unit is ready")
+            logger.debug("Tried removing packages on install and failed "
+                         "with {}, ignoring".format(str(e)))
+        self.unit.status = ActiveStatus("Unit is ready")
 
     def _on_config_changed_or_upgrade(self, event):
         svc_name = self.framework.model.app.name
         charm_config = self.framework.model.config
         r = self.framework.model.relations.get('storage-backend')[0]
         for u in self._rel_get_remote_units('storage-backend'):
-            r.data[self.unit]['backend_name'] = charm_config['volume-backend-name'] or svc_name
-            r.data[self.unit]['subordinate_configuration'] = json.dumps(CinderThreeParContext(charm_config, svc_name))
+            r.data[self.unit]['backend_name'] = \
+                charm_config['volume-backend-name'] or svc_name
+            r.data[self.unit]['subordinate_configuration'] = \
+                json.dumps(CinderThreeParContext(charm_config, svc_name))
 
     def _on_render_storage_backend(self, event):
         svc_name = self.framework.model.app.name
         charm_config = self.framework.model.config
-        data = self.framework.model.relations.get(event.relation.name)[0].data
+#        relations = self.framework.model.relations
+#        data = relations.get(event.relation.name)[0].data
         data = event.relation.data
-        data[self.unit]['backend_name'] = charm_config['volume-backend-name'] or svc_name
-        data[self.unit]['subordinate_configuration'] = json.dumps(CinderThreeParContext(charm_config, svc_name))
+        data[self.unit]['backend_name'] = \
+            charm_config['volume-backend-name'] or svc_name
+        data[self.unit]['subordinate_configuration'] = \
+            json.dumps(CinderThreeParContext(charm_config, svc_name))
+
 
 if __name__ == "__main__":
     main(CharmCinderThreeParCharm)
