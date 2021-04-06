@@ -2,7 +2,10 @@
 
 ## Description
 
-TODO: Describe your charm in a few paragraphs of Markdown
+
+Cinder is the OpenStack block storage (volume) service and allow for different backends to be used to provision volumes.
+
+The cinder 3PAR charm provides integration between Cinder service and HPE 3PAR storage array solution. Users can request volumes using OpenStack APIs and get them provisioned on 3PAR and distributed with either Fiber Channel or iSCSI connection.
 
 ## Usage
 
