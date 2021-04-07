@@ -12,12 +12,14 @@ TEST_3PAR_CONFIG = '\
 {"/etc/cinder/cinder.conf": \
 {"sections": \
 {"charm-cinder-three-par": \
-[["debug", false], \
+[["hpe3par_debug", false], \
 ["driver_type", "fc"], \
 ["hpe3par_iscsi_ips", ""], \
 ["hpe3par_iscsi_chap_enabled", true], \
 ["hpe3par_snapshot_expiration", 48], \
 ["hpe3par_snapshot_retention", 72], \
+["max_over_subscription_ratio", 20.0], \
+["reserved_percentage", 15], \
 ["san_ip", "1.2.3.4"], \
 ["san_login", "login"], \
 ["san_password", "pwd"], \

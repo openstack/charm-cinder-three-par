@@ -1,5 +1,5 @@
 options:
-  debug:
+  hpe3par-debug:
     type: boolean
     default: False
     description: |
@@ -31,6 +31,16 @@ options:
     default: 72
     description: |
       Time in hours a snapshot cannot be deleted.
+  max-over-subscription-ratio:
+    type: float
+    default: 20.0
+    description: |
+      The ratio of oversubscription when thin provisioned volumes are involved.
+  reserved-percentage:
+    type: int
+    default: 15
+    description: |
+      This flag represents the percentage of reserved back-end capacity
   san-ip:
     type: string
     description: | 
