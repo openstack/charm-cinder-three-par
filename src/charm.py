@@ -22,9 +22,14 @@ def CinderThreeParContext(charm_config, service):
             ctxt.append((key, service))
         else:
             ctxt.append((key.replace('-', '_'), charm_config[key]))
-    ctxt.append((
-        'volume_driver',
-        'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver'))
+    if charm_config['driver-type'] == 'fc':
+        ctxt.append((
+            'volume_driver',
+            'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver'))
+    elif charm_config['driver-type'] == 'iscsi':
+        ctxt.append((
+            'volume_driver',
+            'cinder.volume.drivers.hpe.hpe_3par_iscsi.HPE3PARISCSIDriver'))
     return {
         "cinder": {
             "/etc/cinder/cinder.conf": {
