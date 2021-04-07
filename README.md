@@ -23,6 +23,4 @@ Create and activate a virtualenv with the development requirements:
 ## Testing
 
 The Python operator framework includes a very nice harness for testing
-operator behaviour without full deployment. Just `run_tests`:
-
-    ./run_tests
+operator behaviour without full deployment. You can run tests with tox.
