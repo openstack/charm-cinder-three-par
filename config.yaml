@@ -1,5 +1,3 @@
-# Copyright 2021 pguimaraes
-# See LICENSE file for licensing details.
 options:
   debug:
     type: boolean
