@@ -2,6 +2,8 @@
 # Copyright 2021 pguimaraes
 # See LICENSE file for licensing details.
 
+"""Charm for deploying and maintaining the Cinder HPE 3PAR backend driver."""
+
 import json
 import logging
 
@@ -31,6 +33,15 @@ REQUIRED_OPTS_ISCSI = [
 
 
 def CinderThreeParContext(charm_config, service):
+    """Configure context
+
+    :param charm_config: Charm config data
+    :type charm_config: ConfigData
+    :param service: application name
+    :type service: str
+    :returns: dictionary for service config
+    :rtype: dict
+    """
     ctxt = []
     for key in charm_config.keys():
         if key == 'volume-backend-name':
@@ -57,7 +68,7 @@ def CinderThreeParContext(charm_config, service):
 
 
 class CharmCinderThreeParCharm(CharmBase):
-    """Charm the service."""
+    """Charm the Cinder HPE 3PAR driver."""
 
     _stored = StoredState()
 
@@ -80,9 +91,11 @@ class CharmCinderThreeParCharm(CharmBase):
             self._on_render_storage_backend)
 
     def _rel_get_remote_units(self, rel_name):
+        """Get relations remote units"""
         return self.framework.model.get_relation(rel_name).units
 
     def _on_install(self, _):
+        """Install packages"""
         self.unit.status = MaintenanceStatus(
             "Installing packages")
         apt_install(['python3-3parclient'])
@@ -96,6 +109,7 @@ class CharmCinderThreeParCharm(CharmBase):
         self.unit.status = ActiveStatus("Unit is ready")
 
     def _on_config_changed_or_upgrade(self, event):
+        """Update on changed config or charm upgrade"""
         svc_name = self.framework.model.app.name
         charm_config = self.framework.model.config
         r = self.framework.model.relations.get('storage-backend')[0]
@@ -107,6 +121,7 @@ class CharmCinderThreeParCharm(CharmBase):
         self.check_config()
 
     def _on_render_storage_backend(self, event):
+        """Render the current configuration"""
         svc_name = self.framework.model.app.name
         charm_config = self.framework.model.config
 #        relations = self.framework.model.relations
@@ -118,9 +133,7 @@ class CharmCinderThreeParCharm(CharmBase):
             json.dumps(CinderThreeParContext(charm_config, svc_name))
 
     def check_config(self):
-        """
-        Check whether required options are set.
-        """
+        """Check whether required options are set."""
         required_opts = REQUIRED_OPTS
         charm_config = self.framework.model.config
         if charm_config['driver-type'] == 'iscsi':
