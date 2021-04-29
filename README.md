@@ -55,6 +55,11 @@ File `cinder.yaml` contains the following:
       san-ip: 1.2.3.4
       san-login: CHANGE_TO_LOGIN
       san-password: CHANGE_TO_PWD
+      hpe3par-username: CHANGE_TO_USERNAME
+      hpe3par-password: CHANGE_TO_PWD
+      hpe3par-api-url: https://<API_IP>/
+      hpe3par-cpg: <SELECT A CPG>
+      hpe3par_cpg_snap: <SELECT A CPG>
 ```
 
 Here, Cinder HPE 3PAR backend is deployed to a container on machine '1' 
