@@ -20,6 +20,28 @@ on configuring applications.
 
 ## Deployment
 
+### Pre-deployment Setup with Fiber Channel
+
+HPE 3PAR Fiber Channel demands cinder-volume service to be run on baremetal with direct
+access to the fiber channel interfaces.
+
+In this type of deployment, break cinder into two applications:
+
+```yaml
+    cinder-api:
+      charm: cs:cinder
+      options:
+        enabled-services: "api,scheduler"
+        ...
+    cinder-volume:
+      charm: cs:cinder
+      options:
+        enabled-services: "volume"
+```
+
+Cinder-api can be mapped to lxc containers while cinder-volume needs to be placed on 
+a host with access to the fiber channel backend.
+
 ### HPE3PAR-backed storage
 
 Cinder can be backed by HPE 3PAR SAN Array, which provides commercial hardware backend
@@ -29,6 +51,10 @@ File `cinder.yaml` contains the following:
 
 ```yaml
     cinder-three-par:
+      driver-type: fc
+      san-ip: 1.2.3.4
+      san-login: CHANGE_TO_LOGIN
+      san-password: CHANGE_TO_PWD
 ```
 
 Here, Cinder HPE 3PAR backend is deployed to a container on machine '1' 
@@ -37,6 +63,13 @@ and related the cinder subordinate charm:
     juju deploy --to lxd:1 --config cinder-three-par.yaml cinder
     juju deploy cinder-three-par
     juju add-relation cinder-three-par:storage-backend cinder:storage-backend
+    
+Optionally, set option:
+```
+      hpe3par-debug: True
+```
+
+To gather more logs on the deployment.
 
 # Developing
 
