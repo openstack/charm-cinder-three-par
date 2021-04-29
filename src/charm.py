@@ -99,13 +99,6 @@ class CharmCinderThreeParCharm(CharmBase):
         self.unit.status = MaintenanceStatus(
             "Installing packages")
         apt_install(['python3-3parclient'])
-        try:
-            apt_purge(['python3-certifi',
-                       'python3-urllib3',
-                       'python3-requests'])
-        except Exception as e:
-            logger.debug("Tried removing packages on install and failed "
-                         "with {}, ignoring".format(str(e)))
         self.unit.status = ActiveStatus("Unit is ready")
 
     def _on_config_changed_or_upgrade(self, event):
