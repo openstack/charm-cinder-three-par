@@ -14,6 +14,8 @@ TEST_3PAR_CONFIG = '\
 {"charm-cinder-three-par": \
 [["hpe3par_debug", false], \
 ["driver_type", "fc"], \
+["use_multipath_image_xfer", false], \
+["enforce_multipath_for_image_xfer", false], \
 ["hpe3par_iscsi_ips", ""], \
 ["hpe3par_iscsi_chap_enabled", true], \
 ["hpe3par_snapshot_expiration", 48], \
@@ -35,6 +37,7 @@ TEST_3PAR_CONFIG = '\
 
 
 class TestCharm(unittest.TestCase):
+
     def setUp(self):
         self.harness = Harness(CharmCinderThreeParCharm)
         self.addCleanup(self.harness.cleanup)

@@ -98,7 +98,12 @@ class CharmCinderThreeParCharm(CharmBase):
         """Install packages"""
         self.unit.status = MaintenanceStatus(
             "Installing packages")
-        apt_install(['python3-3parclient'])
+        # os_brick lib needs systool from sysfsutils to be able to retrieve
+        # the data from FC links:
+        # https://github.com/openstack/os-brick/blob/ \
+        #     1b2e2295421615847d86508dcd487ec51fa45f25/os_brick/initiator/linuxfc.py#L151
+        apt_install(['python3-3parclient',
+                     'sysfsutils'])
         self.unit.status = ActiveStatus("Unit is ready")
 
     def _on_config_changed_or_upgrade(self, event):

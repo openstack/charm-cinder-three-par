@@ -11,6 +11,20 @@ options:
       3PAR integration accepts either FC or iSCSI backend.
       If set to 'fc', Fiber Channel will be used. Otherwise,
       iscsi is selected.
+  use-multipath-image-xfer:
+    type: boolean
+    default: False
+    description: |
+      If set to True, use_multipath_image_xfer will be set.
+      Multipath will be used to attach/detach volumes for volume to image and
+      image to volume transfers.
+  enforce-multipath-for-image-xfer:
+    type: boolean
+    default: False
+    description: |
+      If set tot True, enforce_multipath_for_image_xfer will be set.
+      Multipathd will be mandatory for volume to image conversions or it will
+      raise an exception.
   hpe3par-iscsi-ips:
     type: string
     default: ''
@@ -85,8 +99,7 @@ options:
   hpe3par_target_nsp:
     type: string
     default: ''
-    description: |
-      
+    description: |      
   volume-backend-name:
     type: string
     description: |
