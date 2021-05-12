@@ -147,12 +147,15 @@ class CharmCinderThreeParCharm(CharmBase):
         # Although retention and expiration configs should be integers,
         # it needs to be set as a string so the operator can specify an empty
         # and it is removed from the config
-        for opt in ["hpe3par-snapshot-retention",
-                    "hpe3par-snapshot-expiration"]:
-            if len(charm_config.get(opt, "")) == 0:
+        for opt in ("hpe3par-snapshot-retention",
+                    "hpe3par-snapshot-expiration"):
+            if len(str(charm_config.get(opt, ""))) == 0:
                 charm_config.pop(opt, None)
-            elif not charm_config[opt].isdecimal():
+            elif not str(charm_config[opt]).isdecimal():
                 # Have a non-decimal char, warn the config_changed hook
+                self.unit.status = BlockedStatus(
+                    'The option {} value ({}) is nondecimal.'.format(
+                        opt, charm_config[opt]))
                 return False
             else:
                 charm_config[opt] = int(charm_config[opt])
