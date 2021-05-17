@@ -36,15 +36,17 @@ options:
     description: |
       If iscsi enabled, this option enables CHAP authentication or not.
   hpe3par-snapshot-expiration:
-    type: string
-    default: 72
-    description: |
+    type: int
+    default: -1
+    description1: |
       Time in hours when a snapshot expires and is deleted.
+      If set to less than 0, this config will be ignored.
   hpe3par-snapshot-retention:
-    type: string
-    default: 48
+    type: int
+    default: -1
     description: |
       Time in hours a snapshot cannot be deleted.
+      If set to less than 0, this config will be ignored
   max-over-subscription-ratio:
     type: float
     default: 20.0

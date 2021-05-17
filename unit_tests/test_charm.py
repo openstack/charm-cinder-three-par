@@ -53,8 +53,6 @@ TEST_3PAR_CONFIG_CHANGED = {
                     ['enforce_multipath_for_image_xfer', False],
                     ['hpe3par_iscsi_ips', ''],
                     ['hpe3par_iscsi_chap_enabled', True],
-                    ['hpe3par_snapshot_expiration', 72],
-                    ['hpe3par_snapshot_retention', 48],
                     ['max_over_subscription_ratio', 20.0],
                     ['reserved_percentage', 15],
                     ['san_ip', '1.2.3.4'],
@@ -77,6 +75,7 @@ TEST_3PAR_CONFIG_CHANGED = {
 
 
 class TestCharm(unittest.TestCase):
+    maxDiff = None
 
     def setUp(self):
         self.harness = Harness(CharmCinderThreeParCharm)
@@ -88,7 +87,7 @@ class TestCharm(unittest.TestCase):
             self.harness.add_relation('storage-backend', 'cinder')
         self.harness.add_relation_unit(self.storage_backend, 'cinder/0')
         self.test_config = copy.deepcopy(TEST_3PAR_CONFIG)
-        self.test_config_changed = copy.deepcopy(TEST_3PAR_CONFIG_CHANGED)
+        self.test_changed = copy.deepcopy(TEST_3PAR_CONFIG_CHANGED)
 
     def test_config_changed(self):
         self.harness.update_config({
@@ -103,7 +102,7 @@ class TestCharm(unittest.TestCase):
             rel.data[self.model.unit],
             {'backend_name': 'charm-cinder-three-par',
              'subordinate_configuration': json.dumps(
-                 self.test_config_changed)})
+                 self.test_changed)})
 
     def test_blocked_status(self):
         self.harness.update_config(unset=["san-ip",  "san-login"])
@@ -117,8 +116,8 @@ class TestCharm(unittest.TestCase):
 
     def test_blocked_unset_retention_expiration(self):
         self.harness.update_config({
-            "hpe3par-snapshot-retention": '',
-            "hpe3par-snapshot-expiration": ''})
+            "hpe3par-snapshot-retention": -1,
+            "hpe3par-snapshot-expiration": -1})
         self.test_config[
             'cinder'][
                 '/etc/cinder/cinder.conf'][
@@ -137,20 +136,6 @@ class TestCharm(unittest.TestCase):
                          {'backend_name': 'charm-cinder-three-par',
                           'subordinate_configuration': json.dumps(
                               self.test_config)})
-
-    def test_blocked_nondecimal_retention_expiration(self):
-        self.harness.update_config({
-          "hpe3par-snapshot-retention": "0xF",
-          "hpe3par-snapshot-expiration": "32.3",
-        })
-        rel = self.model.get_relation('storage-backend', 0)
-        self.assertIsInstance(rel, Relation)
-        self.assertEqual(
-            self.harness.charm.unit.status.message,
-            'The option hpe3par-snapshot-retention value (0xF) is nondecimal.')
-        self.assertIsInstance(
-            self.harness.charm.unit.status,
-            BlockedStatus)
 
     def test_blocked_decimal_retention_expiration(self):
         self.harness.update_config({
