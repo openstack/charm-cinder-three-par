@@ -143,12 +143,9 @@ class CharmCinderThreeParCharm(CharmBase):
         # be left unset and won't be configured:
         # https://github.com/openstack/cinder/blob/stable/ussuri/cinder/ \
         #     volume/drivers/hpe/hpe_3par_common.py#L2834
-
-        # Although retention and expiration configs should be integers,
-        # it needs to be set as a string so the operator can specify an empty
-        # and it is removed from the config
         for opt in ("hpe3par-snapshot-retention",
                     "hpe3par-snapshot-expiration"):
+            # Setting as < 0 will remove the given option from the request.
             if charm_config.get(opt, -1) < 0:
                 charm_config.pop(opt, None)
         required_opts = REQUIRED_OPTS
