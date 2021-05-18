@@ -51,7 +51,7 @@ relations:
 - - cinder:cinder-volume-service
   - nova-cloud-controller:cinder-volume-service
 - - cinder-three-par:storage-backend
-  - cinder:storage-backend
+  - cinder-volume:storage-backend
 - - cinder-volume:identity-service
   - keystone:identity-service
 - - placement:identity-service
@@ -154,9 +154,9 @@ applications:
     to:
     - 1
   cinder-three-par:
-    charm: ./charm-cinder-three-par.charm
+    charm: cs:cinder-three-par
     options:
-      hpe3par-debug: True
+      hpe3par-debug: False
       driver-type: fc
       san-ip: 127.0.0.1
       san-login: admin
