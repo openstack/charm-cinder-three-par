@@ -1,21 +1,29 @@
-"name": "cinder-three-par"
-"summary": "Configure OpenStack Cinder to use 3Par storage."
-"maintainer": "Michael Skalka <michael.skalka@canonical.com>"
-"description": |
-  This charm will add a 'three-par' section to the cinder.conf
-  file and place the approriate configuration information in that
-  section and enable it.
-"tags":
-- "openstack"
-- "storage"
-"series":
-- "xenial"
-"requires":
-  "juju-info":
-    "interface": "juju-info"
-    "scope": "container"
-"provides":
-  "storage-backend":
-    "interface": "cinder-backend"
-    "scope": "container"
-"subordinate": !!bool "true"
+# Copyright 2021 pguimaraes
+# See LICENSE file for licensing details.
+name: charm-cinder-three-par
+summary: |
+  3par integration for OpenStack Block Storage
+maintainer: Pedro Guimaraes <pedro.guimaraes@canonical.com>
+description: |
+  Cinder is the block storage service for the Openstack project.
+  .
+  This charm provides a 3par backend for Cinder
+tags:
+- openstack
+- storage
+- storage-array
+- misc
+series:
+- focal
+- groovy
+- hirsute
+subordinate: true
+provides:
+  storage-backend:
+    interface: cinder-backend
+    scope: container
+requires:
+  juju-info:
+    interface: juju-info
+    scope: container
+

@@ -1,0 +1,9 @@
+.tox
+**/*.swp
+__pycache__
+.stestr/
+build
+*.charm
+cover
+.coverage
+cinder-three-par.charm

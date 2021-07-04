@@ -1,0 +1,2 @@
+ops
+git+https://github.com/juju/charm-helpers.git@87fc7ee5#egg=charmhelpers
