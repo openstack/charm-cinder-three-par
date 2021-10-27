@@ -1,0 +1,12 @@
+charm_name: cinder-three-par
+tests:
+  - tests.tests_cinder_three_par.CinderThreeParTest
+configure:
+  - zaza.openstack.charm_tests.keystone.setup.add_demo_user
+gate_bundles:
+  - bionic-queens
+smoke_bundles:
+  - bionic-queens
+dev_bundles:
+  - bionic-queens
+
