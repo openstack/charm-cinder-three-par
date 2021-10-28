@@ -1,5 +1,16 @@
-# Copyright 2021 pguimaraes
-# See LICENSE file for licensing details.
+# Copyright 2021 Canonical Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import unittest
 import json
@@ -91,10 +102,10 @@ class TestCharm(unittest.TestCase):
 
     def test_config_changed(self):
         self.harness.update_config({
-          "san-ip": "1.2.3.4",
-          "san-login": "login",
-          "san-password": "pwd",
-          "hpe3par-api-url": "test.url"
+            "san-ip": "1.2.3.4",
+            "san-login": "login",
+            "san-password": "pwd",
+            "hpe3par-api-url": "test.url"
         })
         rel = self.model.get_relation('storage-backend', 0)
         self.assertIsInstance(rel, Relation)
@@ -105,7 +116,7 @@ class TestCharm(unittest.TestCase):
                  self.test_changed)})
 
     def test_blocked_status(self):
-        self.harness.update_config(unset=["san-ip",  "san-login"])
+        self.harness.update_config(unset=["san-ip", "san-login"])
         self.harness.charm.on.update_status.emit()
         self.assertEqual(
             self.harness.charm.unit.status.message,
@@ -146,14 +157,10 @@ class TestCharm(unittest.TestCase):
         self.assertIn(
             ["hpe3par_snapshot_retention", 12],
             json.loads(rel.data[self.model.unit]['subordinate_configuration'])[
-                    'cinder'][
-                        '/etc/cinder/cinder.conf'][
-                            'sections'][
-                                'charm-cinder-three-par'])
+                'cinder']['/etc/cinder/cinder.conf']['sections'][
+                'charm-cinder-three-par'])
         self.assertIn(
             ["hpe3par_snapshot_expiration", 48],
             json.loads(rel.data[self.model.unit]['subordinate_configuration'])[
-                    'cinder'][
-                        '/etc/cinder/cinder.conf'][
-                            'sections'][
-                                'charm-cinder-three-par'])
+                'cinder']['/etc/cinder/cinder.conf'][
+                'sections']['charm-cinder-three-par'])
