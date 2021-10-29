@@ -1,4 +1,4 @@
-name: charm-cinder-three-par
+name: cinder-three-par
 summary: |
   3par integration for OpenStack Block Storage
 maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
