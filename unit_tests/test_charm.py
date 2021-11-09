@@ -24,7 +24,7 @@ TEST_3PAR_CONFIG = {
     'cinder': {
         '/etc/cinder/cinder.conf': {
             'sections': {
-                'charm-cinder-three-par': [
+                'cinder-three-par': [
                     ['hpe3par_debug', False],
                     ['driver_type', 'fc'],
                     ['use_multipath_image_xfer', False],
@@ -44,7 +44,7 @@ TEST_3PAR_CONFIG = {
                     ['hpe3par_cpg', ''],
                     ['hpe3par_cpg_snap', ''],
                     ['hpe3par_target_nsp', ''],
-                    ['volume-backend-name', 'charm-cinder-three-par'],
+                    ['volume-backend-name', 'cinder-three-par'],
                     ['volume_driver',
                      'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver']
                 ]
@@ -57,7 +57,7 @@ TEST_3PAR_CONFIG_CHANGED = {
     'cinder': {
         '/etc/cinder/cinder.conf': {
             'sections': {
-                'charm-cinder-three-par': [
+                'cinder-three-par': [
                     ['hpe3par_debug', False],
                     ['driver_type', 'fc'],
                     ['use_multipath_image_xfer', False],
@@ -75,7 +75,7 @@ TEST_3PAR_CONFIG_CHANGED = {
                     ['hpe3par_cpg', ''],
                     ['hpe3par_cpg_snap', ''],
                     ['hpe3par_target_nsp', ''],
-                    ['volume-backend-name', 'charm-cinder-three-par'],
+                    ['volume-backend-name', 'cinder-three-par'],
                     ['volume_driver',
                      'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver']
                 ]
@@ -99,6 +99,9 @@ class TestCharm(unittest.TestCase):
         self.harness.add_relation_unit(self.storage_backend, 'cinder/0')
         self.test_config = copy.deepcopy(TEST_3PAR_CONFIG)
         self.test_changed = copy.deepcopy(TEST_3PAR_CONFIG_CHANGED)
+        self.harness.update_config({'driver-type': 'fc',
+                                    'volume-backend-name':
+                                      'cinder-three-par'})
 
     def test_config_changed(self):
         self.harness.update_config({
@@ -111,7 +114,7 @@ class TestCharm(unittest.TestCase):
         self.assertIsInstance(rel, Relation)
         self.assertEqual(
             rel.data[self.model.unit],
-            {'backend_name': 'charm-cinder-three-par',
+            {'backend_name': 'cinder-three-par',
              'subordinate_configuration': json.dumps(
                  self.test_changed)})
 
@@ -133,18 +136,18 @@ class TestCharm(unittest.TestCase):
             'cinder'][
                 '/etc/cinder/cinder.conf'][
                     'sections'][
-                        'charm-cinder-three-par'].remove(
+                        'cinder-three-par'].remove(
                             ['hpe3par_snapshot_retention', 48])
         self.test_config[
             'cinder'][
                 '/etc/cinder/cinder.conf'][
                     'sections'][
-                        'charm-cinder-three-par'].remove(
+                        'cinder-three-par'].remove(
                             ['hpe3par_snapshot_expiration', 72])
         rel = self.model.get_relation('storage-backend', 0)
         self.assertIsInstance(rel, Relation)
         self.assertEqual(rel.data[self.model.unit],
-                         {'backend_name': 'charm-cinder-three-par',
+                         {'backend_name': 'cinder-three-par',
                           'subordinate_configuration': json.dumps(
                               self.test_config)})
 
@@ -158,9 +161,14 @@ class TestCharm(unittest.TestCase):
             ["hpe3par_snapshot_retention", 12],
             json.loads(rel.data[self.model.unit]['subordinate_configuration'])[
                 'cinder']['/etc/cinder/cinder.conf']['sections'][
-                'charm-cinder-three-par'])
+                'cinder-three-par'])
         self.assertIn(
             ["hpe3par_snapshot_expiration", 48],
             json.loads(rel.data[self.model.unit]['subordinate_configuration'])[
                 'cinder']['/etc/cinder/cinder.conf'][
-                'sections']['charm-cinder-three-par'])
+                'sections']['cinder-three-par'])
+
+    def test_invalid_config_driver_type(self):
+        self.harness.update_config({'driver-type': '???'})
+        self.assertIsInstance(self.harness.charm.unit.status,
+                              BlockedStatus)
