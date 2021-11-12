@@ -44,6 +44,16 @@ REQUIRED_OPTS_ISCSI = [
     'hpe3par-iscsi-ips']
 
 
+class InvalidConfigError(Exception):
+    """Exception raised on invalid configurations."""
+
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
 def CinderThreeParContext(charm_config, service):
     """Configure context
 
@@ -69,7 +79,7 @@ def CinderThreeParContext(charm_config, service):
             'volume_driver',
             'cinder.volume.drivers.hpe.hpe_3par_iscsi.HPE3PARISCSIDriver'))
     else:
-        return BlockedStatus('Invalid config (driver-type)')
+        raise InvalidConfigError('Invalid config (driver-type)')
     return {
         "cinder": {
             "/etc/cinder/cinder.conf": {
@@ -132,10 +142,10 @@ class CharmCinderThreeParCharm(CharmBase):
             # needs to intervene manually
             return
         r = self.framework.model.relations.get('storage-backend')[0]
-        ctx = CinderThreeParContext(charm_config, svc_name)
-        if not isinstance(ctx, dict):
-            # Invalid config option.
-            self.unit.status = ctx
+        try:
+            ctx = CinderThreeParContext(charm_config, svc_name)
+        except InvalidConfigError as e:
+            self.unit.status = BlockedStatus(str(e))
             return
 
         for u in self._rel_get_remote_units('storage-backend'):
@@ -151,10 +161,12 @@ class CharmCinderThreeParCharm(CharmBase):
         data = event.relation.data
         data[self.unit]['backend_name'] = \
             charm_config['volume-backend-name'] or svc_name
-        ctx = CinderThreeParContext(charm_config, svc_name)
-        if not isinstance(ctx, dict):
-            self.unit.status = ctx
+        try:
+            ctx = CinderThreeParContext(charm_config, svc_name)
+        except InvalidConfigError as e:
+            self.unit.status = BlockedStatus(str(e))
             return
+
         data[self.unit]['subordinate_configuration'] = json.dumps(ctx)
 
     def check_config(self, charm_config):
