@@ -4,6 +4,7 @@
     check:
       jobs:
       - bionic-queens
+      - focal-ussuri
     vars:
       needs_charm_build: true
       build_type: charmcraft
