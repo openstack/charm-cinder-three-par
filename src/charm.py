@@ -63,6 +63,7 @@ def CinderThreeParContext(charm_config, service):
     :type service: str
     :returns: dictionary for service config
     :rtype: dict
+    :raises: InvalidConfigError
     """
     ctxt = []
     for key in charm_config.keys():
