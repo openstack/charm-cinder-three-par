@@ -61,12 +61,10 @@ options:
     type: string
     description: | 
       IP address of SAN controller for SSH access to the array
-    default: ''
   san-login:
     type: string
     description: |
       Username for SAN controller for SSH access to the array
-    default: '' 
   san-password:
     type: string
     description: |
