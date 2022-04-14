@@ -35,8 +35,8 @@ TEST_3PAR_CONFIG = {
                     ['hpe3par_snapshot_retention', 48],
                     ['max_over_subscription_ratio', 20.0],
                     ['reserved_percentage', 15],
-                    ['san_ip', ''],
-                    ['san_login', ''],
+                    ['san_ip', '0.0.0.0'],
+                    ['san_login', 'some-login'],
                     ['san_password', ''],
                     ['hpe3par_username', ''],
                     ['hpe3par_password', ''],
@@ -85,6 +85,11 @@ TEST_3PAR_CONFIG_CHANGED = {
 }
 
 
+def get_inner_data(config):
+    return config['cinder']['/etc/cinder/cinder.conf'][
+        'sections']['cinder-three-par']
+
+
 class TestCharm(unittest.TestCase):
     maxDiff = None
 
@@ -101,22 +106,24 @@ class TestCharm(unittest.TestCase):
         self.test_changed = copy.deepcopy(TEST_3PAR_CONFIG_CHANGED)
         self.harness.update_config({'driver-type': 'fc',
                                     'volume-backend-name':
-                                      'cinder-three-par'})
+                                      'cinder-three-par',
+                                    'san-login': 'some-login',
+                                    'san-ip': '0.0.0.0'})
 
     def test_config_changed(self):
         self.harness.update_config({
-            "san-ip": "1.2.3.4",
-            "san-login": "login",
-            "san-password": "pwd",
-            "hpe3par-api-url": "test.url"
+            'san-ip': '1.2.3.4',
+            'san-login': 'login',
+            'san-password': 'pwd',
+            'hpe3par-api-url': 'test.url'
         })
         rel = self.model.get_relation('storage-backend', 0)
         self.assertIsInstance(rel, Relation)
-        self.assertEqual(
-            rel.data[self.model.unit],
-            {'backend_name': 'cinder-three-par',
-             'subordinate_configuration': json.dumps(
-                 self.test_changed)})
+        rdata = rel.data[self.model.unit]
+        self.assertEqual(rdata['backend_name'], 'cinder-three-par')
+        rdata = json.loads(rdata['subordinate_configuration'])
+        self.assertEqual(sorted(get_inner_data(rdata)),
+                         sorted(get_inner_data(self.test_changed)))
 
     def test_blocked_status(self):
         self.harness.update_config(unset=["san-ip", "san-login"])
@@ -132,24 +139,14 @@ class TestCharm(unittest.TestCase):
         self.harness.update_config({
             "hpe3par-snapshot-retention": -1,
             "hpe3par-snapshot-expiration": -1})
-        self.test_config[
-            'cinder'][
-                '/etc/cinder/cinder.conf'][
-                    'sections'][
-                        'cinder-three-par'].remove(
-                            ['hpe3par_snapshot_retention', 48])
-        self.test_config[
-            'cinder'][
-                '/etc/cinder/cinder.conf'][
-                    'sections'][
-                        'cinder-three-par'].remove(
-                            ['hpe3par_snapshot_expiration', 72])
+        inner = get_inner_data(self.test_config)
+        inner.remove(['hpe3par_snapshot_retention', 48])
+        inner.remove(['hpe3par_snapshot_expiration', 72])
         rel = self.model.get_relation('storage-backend', 0)
         self.assertIsInstance(rel, Relation)
-        self.assertEqual(rel.data[self.model.unit],
-                         {'backend_name': 'cinder-three-par',
-                          'subordinate_configuration': json.dumps(
-                              self.test_config)})
+        rdata = rel.data[self.model.unit]['subordinate_configuration']
+        self.assertEqual(sorted(get_inner_data(json.loads(rdata))),
+                         sorted(inner))
 
     def test_blocked_decimal_retention_expiration(self):
         self.harness.update_config({
