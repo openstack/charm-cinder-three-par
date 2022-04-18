@@ -16,7 +16,7 @@ import unittest
 import json
 import copy
 
-from ops.model import Relation, BlockedStatus
+from ops.model import Relation, BlockedStatus, ActiveStatus
 from ops.testing import Harness
 from src.charm import CharmCinderThreeParCharm
 
@@ -29,7 +29,6 @@ TEST_3PAR_CONFIG = {
                     ['driver_type', 'fc'],
                     ['use_multipath_image_xfer', False],
                     ['enforce_multipath_for_image_xfer', False],
-                    ['hpe3par_iscsi_ips', ''],
                     ['hpe3par_iscsi_chap_enabled', True],
                     ['hpe3par_snapshot_expiration', 72],
                     ['hpe3par_snapshot_retention', 48],
@@ -37,14 +36,7 @@ TEST_3PAR_CONFIG = {
                     ['reserved_percentage', 15],
                     ['san_ip', '0.0.0.0'],
                     ['san_login', 'some-login'],
-                    ['san_password', ''],
-                    ['hpe3par_username', ''],
-                    ['hpe3par_password', ''],
-                    ['hpe3par_api_url', ''],
-                    ['hpe3par_cpg', ''],
-                    ['hpe3par_cpg_snap', ''],
-                    ['hpe3par_target_nsp', ''],
-                    ['volume-backend-name', 'cinder-three-par'],
+                    ['volume_backend_name', 'cinder-three-par'],
                     ['volume_driver',
                      'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver']
                 ]
@@ -62,20 +54,14 @@ TEST_3PAR_CONFIG_CHANGED = {
                     ['driver_type', 'fc'],
                     ['use_multipath_image_xfer', False],
                     ['enforce_multipath_for_image_xfer', False],
-                    ['hpe3par_iscsi_ips', ''],
                     ['hpe3par_iscsi_chap_enabled', True],
                     ['max_over_subscription_ratio', 20.0],
                     ['reserved_percentage', 15],
                     ['san_ip', '1.2.3.4'],
                     ['san_login', 'login'],
                     ['san_password', 'pwd'],
-                    ['hpe3par_username', ''],
-                    ['hpe3par_password', ''],
                     ['hpe3par_api_url', 'test.url'],
-                    ['hpe3par_cpg', ''],
-                    ['hpe3par_cpg_snap', ''],
-                    ['hpe3par_target_nsp', ''],
-                    ['volume-backend-name', 'cinder-three-par'],
+                    ['volume_backend_name', 'cinder-three-par'],
                     ['volume_driver',
                      'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver']
                 ]
@@ -127,13 +113,12 @@ class TestCharm(unittest.TestCase):
 
     def test_blocked_status(self):
         self.harness.update_config(unset=["san-ip", "san-login"])
-        self.harness.charm.on.update_status.emit()
-        self.assertEqual(
-            self.harness.charm.unit.status.message,
-            'Missing options: san-login,san-ip')
         self.assertIsInstance(
             self.harness.charm.unit.status,
             BlockedStatus)
+        message = self.harness.charm.unit.status.message
+        self.assertIn('san-login', message)
+        self.assertIn('san-ip', message)
 
     def test_blocked_unset_retention_expiration(self):
         self.harness.update_config({
@@ -167,5 +152,5 @@ class TestCharm(unittest.TestCase):
 
     def test_invalid_config_driver_type(self):
         self.harness.update_config({'driver-type': '???'})
-        self.assertIsInstance(self.harness.charm.unit.status,
-                              BlockedStatus)
+        self.assertFalse(isinstance(self.harness.charm.unit.status,
+                                    ActiveStatus))

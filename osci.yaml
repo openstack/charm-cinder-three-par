@@ -3,8 +3,9 @@
       - charm-unit-jobs
     check:
       jobs:
-      - bionic-queens
       - focal-ussuri
+      - focal-yoga
+      - jammy-yoga
     vars:
       needs_charm_build: true
       build_type: charmcraft
