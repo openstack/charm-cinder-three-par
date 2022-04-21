@@ -52,12 +52,6 @@ class InvalidConfigError(Exception):
     pass
 
 
-class MissingConfigError(Exception):
-    """Exception raised on missing 3PAR config parameter."""
-
-    pass
-
-
 def CinderThreeParContext(charm_config, service):
     """Configure context
 
