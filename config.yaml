@@ -27,7 +27,7 @@ options:
       raise an exception.
   hpe3par-iscsi-ips:
     type: string
-    default: ''
+    default: 
     description: |
       Comma-separated list of IP:PORT to be used for the iscsi connection.
   hpe3par-iscsi-chap-enabled:
@@ -61,49 +61,47 @@ options:
     type: string
     description: | 
       IP address of SAN controller for SSH access to the array
-    default: ''
   san-login:
     type: string
     description: |
       Username for SAN controller for SSH access to the array
-    default: '' 
   san-password:
     type: string
     description: |
       Password for SAN controller for SSH access to the array
-    default: ''
+    default: 
   hpe3par-username:
     type: string
     description: |
       3PAR username with the 'edit' role
-    default: ''
+    default: 
   hpe3par-password:
     type: string
     description: |
       3PAR password for the user specified in hpe3par_username
-    default: ''
+    default: 
   hpe3par-api-url:
     type: string
     description: |
       3PAR WS API Server URL
-    default: ''
+    default: 
   hpe3par-cpg:
     type: string
     description: |
       3PAR CPG to use for volume creation
-    default: ''
+    default: 
   hpe3par_cpg_snap:
     type: string
-    default: ''
+    default: 
     description: |
       Sets the CPG name for the snapshot.
       If empty, use the userCPG will be used.
   hpe3par_target_nsp:
     type: string
-    default: ''
+    default: 
     description: |      
   volume-backend-name:
     type: string
     description: |
       Name to present to cinder, leave blank to use charm (or alias) name
-    default: ''
+    default: 

@@ -1,0 +1,49 @@
+series: focal
+comment:
+- 'machines section to decide order of deployment. database sooner = faster'
+machines:
+  '0':
+    constraints: mem=3072M
+  '1':
+  '2':
+    constraints: mem=4G root-disk=16G
+  '3':
+local_overlay_enabled: false
+relations:
+- - keystone:shared-db
+  - mysql:shared-db
+- - cinder:shared-db
+  - mysql:shared-db
+- - cinder:identity-service
+  - keystone:identity-service
+- - cinder:amqp
+  - rabbitmq-server:amqp
+- - cinder:storage-backend
+  - cinder-three-par:storage-backend
+applications:
+  mysql:
+    charm: ch:~openstack-charmers-next/percona-cluster
+    num_units: 1
+    to:
+    - '0'
+  keystone:
+    charm: ch:~openstack-charmers-next/keystone
+    num_units: 1
+    to:
+    - '1'
+  cinder:
+    charm: ch:~openstack-charmers-next/cinder
+    num_units: 1
+    options:
+      block-device: /dev/vdb
+      overwrite: "true"
+      ephemeral-unmount: /mnt
+    to:
+    - '2'
+  cinder-three-par:
+    charm: ../../cinder-three-par.charm
+  rabbitmq-server:
+    charm: ch:~openstack-charmers-next/rabbitmq-server
+    num_units: 1
+    to:
+    - '3'

@@ -1,9 +1,7 @@
-# Copyright 2021 pguimaraes
-# See LICENSE file for licensing details.
-name: charm-cinder-three-par
+name: cinder-three-par
 summary: |
   3par integration for OpenStack Block Storage
-maintainer: Pedro Guimaraes <pedro.guimaraes@canonical.com>
+maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
 description: |
   Cinder is the block storage service for the Openstack project.
   .
@@ -15,8 +13,7 @@ tags:
 - misc
 series:
 - focal
-- groovy
-- hirsute
+- jammy
 subordinate: true
 provides:
   storage-backend:

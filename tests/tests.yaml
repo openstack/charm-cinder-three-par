@@ -1,0 +1,17 @@
+charm_name: cinder-three-par
+tests:
+  - tests.tests_cinder_three_par.CinderThreeParTest
+configure:
+  - zaza.openstack.charm_tests.keystone.setup.add_demo_user
+gate_bundles:
+  - focal-ussuri
+  - focal-yoga
+  - jammy-yoga
+smoke_bundles:
+  - focal-ussuri
+  - focal-yoga
+  - jammy-yoga
+dev_bundles:
+  - focal-ussuri
+  - focal-yoga
+  - jammy-yoga

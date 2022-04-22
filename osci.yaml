@@ -1,0 +1,12 @@
+- project:
+    templates:
+      - charm-unit-jobs
+    check:
+      jobs:
+      - focal-ussuri
+      - focal-yoga
+      - jammy-yoga
+    vars:
+      needs_charm_build: true
+      build_type: charmcraft
+      charm_build_name: cinder-three-par
