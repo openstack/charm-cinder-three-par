@@ -14,66 +14,10 @@
 
 import unittest
 import json
-import copy
 
 from ops.model import Relation, BlockedStatus, ActiveStatus
 from ops.testing import Harness
 from src.charm import CharmCinderThreeParCharm
-
-TEST_3PAR_CONFIG = {
-    'cinder': {
-        '/etc/cinder/cinder.conf': {
-            'sections': {
-                'cinder-three-par': [
-                    ['hpe3par_debug', False],
-                    ['driver_type', 'fc'],
-                    ['use_multipath_image_xfer', False],
-                    ['enforce_multipath_for_image_xfer', False],
-                    ['hpe3par_iscsi_chap_enabled', True],
-                    ['hpe3par_snapshot_expiration', 72],
-                    ['hpe3par_snapshot_retention', 48],
-                    ['max_over_subscription_ratio', 20.0],
-                    ['reserved_percentage', 15],
-                    ['san_ip', '0.0.0.0'],
-                    ['san_login', 'some-login'],
-                    ['volume_backend_name', 'cinder-three-par'],
-                    ['volume_driver',
-                     'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver']
-                ]
-            }
-        }
-    }
-}
-
-TEST_3PAR_CONFIG_CHANGED = {
-    'cinder': {
-        '/etc/cinder/cinder.conf': {
-            'sections': {
-                'cinder-three-par': [
-                    ['hpe3par_debug', False],
-                    ['driver_type', 'fc'],
-                    ['use_multipath_image_xfer', False],
-                    ['enforce_multipath_for_image_xfer', False],
-                    ['hpe3par_iscsi_chap_enabled', True],
-                    ['max_over_subscription_ratio', 20.0],
-                    ['reserved_percentage', 15],
-                    ['san_ip', '1.2.3.4'],
-                    ['san_login', 'login'],
-                    ['san_password', 'pwd'],
-                    ['hpe3par_api_url', 'test.url'],
-                    ['volume_backend_name', 'cinder-three-par'],
-                    ['volume_driver',
-                     'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver']
-                ]
-            }
-        }
-    }
-}
-
-
-def get_inner_data(config):
-    return config['cinder']['/etc/cinder/cinder.conf'][
-        'sections']['cinder-three-par']
 
 
 class TestCharm(unittest.TestCase):
@@ -88,13 +32,29 @@ class TestCharm(unittest.TestCase):
         self.storage_backend = \
             self.harness.add_relation('storage-backend', 'cinder')
         self.harness.add_relation_unit(self.storage_backend, 'cinder/0')
-        self.test_config = copy.deepcopy(TEST_3PAR_CONFIG)
-        self.test_changed = copy.deepcopy(TEST_3PAR_CONFIG_CHANGED)
-        self.harness.update_config({'driver-type': 'fc',
-                                    'volume-backend-name':
-                                      'cinder-three-par',
-                                    'san-login': 'some-login',
-                                    'san-ip': '0.0.0.0'})
+        self.harness.update_config(
+            {
+                "hpe3par-api-url": "test.url",
+                "hpe3par-username": "testusername",
+                "hpe3par-password": "pass",
+                "san-ip": "0.0.0.0",
+                "san-login": "some-login",
+                "san-password": "testpassword",
+            }
+        )
+
+    def _get_sub_conf(self):
+        rel = self.model.get_relation('storage-backend', 0)
+        self.assertIsInstance(rel, Relation)
+        rdata = rel.data[self.model.unit]
+        rdata = json.loads(rdata['subordinate_configuration'])
+        return dict(rdata['cinder']['/etc/cinder/cinder.conf'][
+            'sections']['cinder-three-par'])
+
+    def test_backend_name_in_data(self):
+        rel = self.model.get_relation('storage-backend', 0)
+        rdata = rel.data[self.model.unit]
+        self.assertEqual(rdata['backend_name'], 'cinder-three-par')
 
     def test_config_changed(self):
         self.harness.update_config({
@@ -103,13 +63,27 @@ class TestCharm(unittest.TestCase):
             'san-password': 'pwd',
             'hpe3par-api-url': 'test.url'
         })
-        rel = self.model.get_relation('storage-backend', 0)
-        self.assertIsInstance(rel, Relation)
-        rdata = rel.data[self.model.unit]
-        self.assertEqual(rdata['backend_name'], 'cinder-three-par')
-        rdata = json.loads(rdata['subordinate_configuration'])
-        self.assertEqual(sorted(get_inner_data(rdata)),
-                         sorted(get_inner_data(self.test_changed)))
+        self.assertEqual(
+            self._get_sub_conf(),
+            {
+                'driver_type': 'fc',
+                'enforce_multipath_for_image_xfer': False,
+                'hpe3par_api_url': 'test.url',
+                'hpe3par_debug': False,
+                'hpe3par_iscsi_chap_enabled': True,
+                'hpe3par_password': 'pass',
+                'hpe3par_username': 'testusername',
+                'max_over_subscription_ratio': 20.0,
+                'reserved_percentage': 15,
+                'san_ip': '1.2.3.4',
+                'san_login': 'login',
+                'san_password': 'pwd',
+                'use_multipath_for_image_xfer': False,
+                'volume_backend_name': 'cinder-three-par',
+                'volume_driver':
+                'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver',
+            }
+        )
 
     def test_blocked_status(self):
         self.harness.update_config(unset=["san-ip", "san-login"])
@@ -124,33 +98,121 @@ class TestCharm(unittest.TestCase):
         self.harness.update_config({
             "hpe3par-snapshot-retention": -1,
             "hpe3par-snapshot-expiration": -1})
-        inner = get_inner_data(self.test_config)
-        inner.remove(['hpe3par_snapshot_retention', 48])
-        inner.remove(['hpe3par_snapshot_expiration', 72])
-        rel = self.model.get_relation('storage-backend', 0)
-        self.assertIsInstance(rel, Relation)
-        rdata = rel.data[self.model.unit]['subordinate_configuration']
-        self.assertEqual(sorted(get_inner_data(json.loads(rdata))),
-                         sorted(inner))
+        self.assertEqual(
+            self._get_sub_conf(),
+            {
+                'driver_type': 'fc',
+                'enforce_multipath_for_image_xfer': False,
+                'hpe3par_api_url': 'test.url',
+                'hpe3par_debug': False,
+                'hpe3par_iscsi_chap_enabled': True,
+                'hpe3par_password': 'pass',
+                'hpe3par_username': 'testusername',
+                'max_over_subscription_ratio': 20.0,
+                'reserved_percentage': 15,
+                'san_ip': '0.0.0.0',
+                'san_login': 'some-login',
+                'san_password': 'testpassword',
+                'use_multipath_for_image_xfer': False,
+                'volume_backend_name': 'cinder-three-par',
+                'volume_driver':
+                'cinder.volume.drivers.hpe.hpe_3par_fc.HPE3PARFCDriver',
+            }
+        )
 
     def test_blocked_decimal_retention_expiration(self):
         self.harness.update_config({
             "hpe3par-snapshot-retention": 12,
             "hpe3par-snapshot-expiration": 48})
-        rel = self.model.get_relation('storage-backend', 0)
-        self.assertIsInstance(rel, Relation)
-        self.assertIn(
-            ["hpe3par_snapshot_retention", 12],
-            json.loads(rel.data[self.model.unit]['subordinate_configuration'])[
-                'cinder']['/etc/cinder/cinder.conf']['sections'][
-                'cinder-three-par'])
-        self.assertIn(
-            ["hpe3par_snapshot_expiration", 48],
-            json.loads(rel.data[self.model.unit]['subordinate_configuration'])[
-                'cinder']['/etc/cinder/cinder.conf'][
-                'sections']['cinder-three-par'])
+        conf = self._get_sub_conf()
+        self.assertEqual(conf.get("hpe3par_snapshot_retention"), 12)
+        self.assertEqual(conf.get("hpe3par_snapshot_expiration"), 48)
 
-    def test_invalid_config_driver_type(self):
-        self.harness.update_config({'driver-type': '???'})
-        self.assertFalse(isinstance(self.harness.charm.unit.status,
-                                    ActiveStatus))
+    def test_status_with_mandatory_config(self):
+        self.assertEqual(
+            self.harness.charm.unit.status.message,
+            "Unit is ready"
+        )
+        self.assertIsInstance(self.harness.charm.unit.status, ActiveStatus)
+        self.harness.update_config(
+            unset=["san-ip", "san-login"],
+        )
+        self.assertEqual(
+            self.harness.charm.unit.status.message,
+            "Missing option(s): san-ip,san-login",
+        )
+        self.assertIsInstance(self.harness.charm.unit.status, BlockedStatus)
+
+    def test_invalid_driver_type(self):
+        self.harness.update_config(
+            {
+                "driver-type": "justwrong",
+            }
+        )
+        self.assertEqual(
+            self.harness.charm.unit.status.message,
+            "Invalid driver-type value: justwrong"
+        )
+        self.assertIsInstance(self.harness.charm.unit.status, BlockedStatus)
+
+    def test_required_params_when_iscsi_driver(self):
+        self.harness.update_config(
+            {
+                "driver-type": "iscsi",
+            }
+        )
+        self.assertEqual(
+            self.harness.charm.unit.status.message,
+            "Missing option: hpe3par-iscsi-ips",
+        )
+        self.assertIsInstance(self.harness.charm.unit.status, BlockedStatus)
+
+        self.harness.update_config(
+            {
+                "hpe3par-iscsi-ips": "127.0.0.1",
+            }
+        )
+        self.assertEqual(
+            self.harness.charm.unit.status.message,
+            "Unit is ready",
+        )
+        self.assertIsInstance(self.harness.charm.unit.status, ActiveStatus)
+
+    def test_multipath_config(self):
+        self.harness.update_config(
+            {
+                "enforce-multipath-for-image-xfer": True,
+                "use-multipath-for-image-xfer": True,
+            }
+        )
+        conf = self._get_sub_conf()
+        self.assertTrue(conf.get("use_multipath_for_image_xfer"))
+        self.assertTrue(conf.get("enforce_multipath_for_image_xfer"))
+
+    def test_volume_backend_name_config(self):
+        self.assertEqual(
+            self._get_sub_conf().get("volume_backend_name"),
+            "cinder-three-par"
+        )
+
+        self.harness.update_config(
+            {
+                "volume-backend-name": "test-backend",
+            }
+        )
+        self.assertEqual(
+            self._get_sub_conf().get("volume_backend_name"),
+            "test-backend"
+        )
+
+    def test_iscsi_driver(self):
+        self.harness.update_config({
+            "driver-type": "iscsi",
+            "hpe3par-iscsi-ips": "127.0.0.1",
+        })
+        conf = self._get_sub_conf()
+        self.assertEqual(conf.get("driver_type"), "iscsi")
+        self.assertEqual(
+            conf.get("volume_driver"),
+            "cinder.volume.drivers.hpe.hpe_3par_iscsi.HPE3PARISCSIDriver"
+        )

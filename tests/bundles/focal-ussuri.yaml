@@ -1,49 +1,35 @@
 series: focal
-comment:
-- 'machines section to decide order of deployment. database sooner = faster'
+variables:
+  openstack-origin: &openstack-origin distro
 machines:
   '0':
-    constraints: mem=3072M
-  '1':
-  '2':
-    constraints: mem=4G root-disk=16G
-  '3':
 local_overlay_enabled: false
 relations:
-- - keystone:shared-db
-  - mysql:shared-db
-- - cinder:shared-db
-  - mysql:shared-db
-- - cinder:identity-service
-  - keystone:identity-service
-- - cinder:amqp
-  - rabbitmq-server:amqp
-- - cinder:storage-backend
-  - cinder-three-par:storage-backend
+  - - cinder:storage-backend
+    - cinder-three-par:storage-backend
 applications:
-  mysql:
-    charm: ch:~openstack-charmers-next/percona-cluster
-    num_units: 1
-    to:
-    - '0'
-  keystone:
-    charm: ch:~openstack-charmers-next/keystone
-    num_units: 1
-    to:
-    - '1'
   cinder:
-    charm: ch:~openstack-charmers-next/cinder
+    charm: ch:cinder
     num_units: 1
     options:
-      block-device: /dev/vdb
+      openstack-origin: *openstack-origin
+      block-device: None
       overwrite: "true"
       ephemeral-unmount: /mnt
     to:
-    - '2'
+      - '0'
   cinder-three-par:
     charm: ../../cinder-three-par.charm
-  rabbitmq-server:
-    charm: ch:~openstack-charmers-next/rabbitmq-server
-    num_units: 1
-    to:
-    - '3'
+    options:
+      hpe3par-debug: False
+      driver-type: fc
+      san-ip: 127.0.0.1
+      san-login: admin
+      san-password: password
+      hpe3par-username: admin
+      hpe3par-password: password
+      hpe3par-api-url: https://127.0.0.1:8080/api/v1/
+      hpe3par-cpg: cpgname
+      hpe3par_cpg_snap: cpgname
+      use-multipath-for-image-xfer: True
+      enforce-multipath-for-image-xfer: True

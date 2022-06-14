@@ -1,17 +1,17 @@
 charm_name: cinder-three-par
+
+target_deploy_status:
+  cinder:
+    workload-status: blocked
+    workload-status-message-prefix: "Missing relations:"
+
 tests:
   - tests.tests_cinder_three_par.CinderThreeParTest
-configure:
-  - zaza.openstack.charm_tests.keystone.setup.add_demo_user
+
+configure: []
 gate_bundles:
   - focal-ussuri
-  - focal-yoga
-  - jammy-yoga
 smoke_bundles:
   - focal-ussuri
-  - focal-yoga
-  - jammy-yoga
 dev_bundles:
   - focal-ussuri
-  - focal-yoga
-  - jammy-yoga

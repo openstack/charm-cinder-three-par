@@ -11,11 +11,11 @@ options:
       3PAR integration accepts either FC or iSCSI backend.
       If set to 'fc', Fiber Channel will be used. Otherwise,
       iscsi is selected.
-  use-multipath-image-xfer:
+  use-multipath-for-image-xfer:
     type: boolean
     default: False
     description: |
-      If set to True, use_multipath_image_xfer will be set.
+      If set to True, use_multipath_for_image_xfer will be set.
       Multipath will be used to attach/detach volumes for volume to image and
       image to volume transfers.
   enforce-multipath-for-image-xfer:
@@ -27,7 +27,6 @@ options:
       raise an exception.
   hpe3par-iscsi-ips:
     type: string
-    default: 
     description: |
       Comma-separated list of IP:PORT to be used for the iscsi connection.
   hpe3par-iscsi-chap-enabled:
@@ -59,7 +58,7 @@ options:
       This flag represents the percentage of reserved back-end capacity
   san-ip:
     type: string
-    description: | 
+    description: |
       IP address of SAN controller for SSH access to the array
   san-login:
     type: string
@@ -69,39 +68,32 @@ options:
     type: string
     description: |
       Password for SAN controller for SSH access to the array
-    default: 
   hpe3par-username:
     type: string
     description: |
       3PAR username with the 'edit' role
-    default: 
   hpe3par-password:
     type: string
     description: |
       3PAR password for the user specified in hpe3par_username
-    default: 
   hpe3par-api-url:
     type: string
     description: |
       3PAR WS API Server URL
-    default: 
   hpe3par-cpg:
     type: string
     description: |
       3PAR CPG to use for volume creation
-    default: 
   hpe3par_cpg_snap:
     type: string
-    default: 
     description: |
       Sets the CPG name for the snapshot.
       If empty, use the userCPG will be used.
   hpe3par_target_nsp:
     type: string
-    default: 
-    description: |      
+    description: |
   volume-backend-name:
     type: string
     description: |
       Name to present to cinder, leave blank to use charm (or alias) name
-    default: 
+    default: ''

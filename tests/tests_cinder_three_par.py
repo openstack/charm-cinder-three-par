@@ -16,8 +16,31 @@
 
 """Encapsulate cinder-purestorage testing."""
 
-import zaza.openstack.charm_tests.test_utils as test_utils
+import zaza.model
+from zaza.openstack.charm_tests.test_utils import BaseCharmTest
 
 
-class CinderThreeParTest(test_utils.OpenStackBaseTest):
+class CinderThreeParTest(BaseCharmTest):
     """Encapsulate three-par tests."""
+
+    def test_cinder_config(self):
+        """Test that configuration options match our expectations."""
+        zaza.model.run_on_leader(
+            "cinder",
+            "sudo cp /etc/cinder/cinder.conf /tmp/",
+        )
+        zaza.model.block_until_oslo_config_entries_match(
+            "cinder",
+            "/tmp/cinder.conf",
+            {
+                "cinder-three-par": {
+                    # sanity test a few common params
+                    "volume_backend_name": ["cinder-three-par"],
+                    "hpe3par_api_url": ["https://127.0.0.1:8080/api/v1/"],
+                    "san_login": ["admin"],
+                    "use_multipath_for_image_xfer": ["True"],
+                    "enforce_multipath_for_image_xfer": ["True"],
+                }
+            },
+            timeout=2,
+        )
