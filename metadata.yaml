@@ -12,8 +12,8 @@ tags:
 - storage-array
 - misc
 series:
+- bionic
 - focal
-- jammy
 subordinate: true
 provides:
   storage-backend:
