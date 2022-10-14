@@ -18,6 +18,7 @@ applications:
       ephemeral-unmount: /mnt
     to:
       - '0'
+    channel: zed/edge
   cinder-three-par:
     charm: ../../cinder-three-par.charm
     options:
