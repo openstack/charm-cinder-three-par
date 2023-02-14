@@ -1,17 +1,27 @@
 charm_name: cinder-three-par
 
+smoke_bundles:
+- jammy-zed
+
+gate_bundles:
+- jammy-zed
+
+dev_bundles:
+- jammy-antelope
+- kinetic-zed
+- lunar-antelope
+
 target_deploy_status:
   cinder:
     workload-status: blocked
     workload-status-message-prefix: "Missing relations:"
 
+configure: []
+
 tests:
   - tests.tests_cinder_three_par.CinderThreeParTest
 
-configure: []
-gate_bundles:
-  - focal-ussuri
-smoke_bundles:
-  - focal-ussuri
-dev_bundles:
-  - focal-ussuri
+tests_options:
+  force_deploy:
+    - kinetic-zed
+    - lunar-antelope

@@ -1,0 +1,35 @@
+series: jammy
+variables:
+  openstack-origin: &openstack-origin cloud:jammy-antelope
+machines:
+  '0':
+local_overlay_enabled: false
+relations:
+  - - cinder:storage-backend
+    - cinder-three-par:storage-backend
+applications:
+  cinder:
+    charm: ch:cinder
+    num_units: 1
+    options:
+      openstack-origin: *openstack-origin
+      block-device: None
+      overwrite: "true"
+      ephemeral-unmount: /mnt
+    to:
+      - '0'
+  cinder-three-par:
+    charm: ../../../cinder-three-par_ubuntu-22.04-amd64_ubuntu-22.10-amd64_ubuntu-23.04-amd64.charm
+    options:
+      hpe3par-debug: False
+      driver-type: fc
+      san-ip: 127.0.0.1
+      san-login: admin
+      san-password: password
+      hpe3par-username: admin
+      hpe3par-password: password
+      hpe3par-api-url: https://127.0.0.1:8080/api/v1/
+      hpe3par-cpg: cpgname
+      hpe3par_cpg_snap: cpgname
+      use-multipath-for-image-xfer: True
+      enforce-multipath-for-image-xfer: True

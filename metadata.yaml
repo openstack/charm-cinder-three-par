@@ -12,8 +12,9 @@ tags:
 - storage-array
 - misc
 series:
-- focal
 - jammy
+- kinetic
+- lunar
 subordinate: true
 provides:
   storage-backend:
