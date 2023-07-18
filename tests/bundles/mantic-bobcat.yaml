@@ -1,6 +1,6 @@
-series: jammy
+series: mantic
 variables:
-  openstack-origin: &openstack-origin cloud:jammy-zed
+  openstack-origin: &openstack-origin distro
 machines:
   '0':
 local_overlay_enabled: false
@@ -19,7 +19,7 @@ applications:
     to:
       - '0'
   cinder-three-par:
-    charm: ../../../cinder-three-par_ubuntu-22.04-amd64_ubuntu-22.10-amd64_ubuntu-23.04-amd64.charm
+    charm: ../../../cinder-three-par_ubuntu-22.04-amd64_ubuntu-22.10-amd64_ubuntu-23.04-amd64_ubuntu-23.10-amd64.charm
     options:
       hpe3par-debug: False
       driver-type: fc

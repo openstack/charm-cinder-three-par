@@ -1,6 +1,6 @@
 series: jammy
 variables:
-  openstack-origin: &openstack-origin cloud:jammy-antelope
+  openstack-origin: &openstack-origin cloud:jammy-bobcat
 machines:
   '0':
 local_overlay_enabled: false
