@@ -13,7 +13,6 @@ tags:
 - misc
 series:
 - jammy
-- lunar
 - mantic
 subordinate: true
 provides:
@@ -24,4 +23,3 @@ requires:
   juju-info:
     interface: juju-info
     scope: container
-
