@@ -7,14 +7,12 @@ description: |
   .
   This charm provides a 3par backend for Cinder
 tags:
-- openstack
-- storage
-- storage-array
-- misc
+  - openstack
+  - storage
+  - storage-array
+  - misc
 series:
-- jammy
-- lunar
-- mantic
+  - jammy
 subordinate: true
 provides:
   storage-backend:
