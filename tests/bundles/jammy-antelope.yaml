@@ -20,7 +20,7 @@ applications:
       - '0'
     channel: 2024.1/edge
   cinder-three-par:
-    charm: ../../../cinder-three-par_ubuntu-22.04-amd64_ubuntu-22.10-amd64_ubuntu-23.04-amd64_ubuntu-23.10-amd64.charm
+    charm: ../../cinder-three-par.charm
     options:
       hpe3par-debug: False
       driver-type: fc

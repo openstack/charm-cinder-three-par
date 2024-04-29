@@ -1,0 +1,5 @@
+# requirements
+ops
+git+https://github.com/juju/charm-helpers.git#egg=charmhelpers
+git+https://opendev.org/openstack/charm-ops-openstack#egg=ops_openstack
+git+https://opendev.org/openstack/charm-ops-interface-tls-certificates#egg=interface_tls_certificates
