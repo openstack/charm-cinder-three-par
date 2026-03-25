@@ -134,6 +134,7 @@ class TestCharm(unittest.TestCase):
             "Unit is ready"
         )
         self.assertIsInstance(self.harness.charm.unit.status, ActiveStatus)
+        self.assertTrue(self.harness.charm._stored.is_started)
         self.harness.update_config(
             unset=["san-ip", "san-login"],
         )
@@ -154,6 +155,7 @@ class TestCharm(unittest.TestCase):
             "Invalid driver-type value: justwrong"
         )
         self.assertIsInstance(self.harness.charm.unit.status, BlockedStatus)
+        self.assertFalse(self.harness.charm._stored.is_started)
 
     def test_required_params_when_iscsi_driver(self):
         self.harness.update_config(
@@ -166,6 +168,7 @@ class TestCharm(unittest.TestCase):
             "Missing option: hpe3par-iscsi-ips",
         )
         self.assertIsInstance(self.harness.charm.unit.status, BlockedStatus)
+        self.assertFalse(self.harness.charm._stored.is_started)
 
         self.harness.update_config(
             {
@@ -177,6 +180,7 @@ class TestCharm(unittest.TestCase):
             "Unit is ready",
         )
         self.assertIsInstance(self.harness.charm.unit.status, ActiveStatus)
+        self.assertTrue(self.harness.charm._stored.is_started)
 
     def test_multipath_config(self):
         self.harness.update_config(
