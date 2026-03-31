@@ -68,8 +68,10 @@ class CharmCinderThreeParCharm(CinderStoragePluginCharm):
         status = _check_config(self.framework.model.config)
         if not isinstance(status, ActiveStatus):
             self.unit.status = status
+            self._stored.is_started = False
             return
 
+        self._stored.is_started = True
         super().on_config(event)
 
     def cinder_configuration(self, charm_config):
